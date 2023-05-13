@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using STGeneticsTest.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Data.SqlClient;
+using Dapper;
+using System.Collections.Generic;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace STGeneticsTest.Controllers
 {
@@ -14,82 +18,57 @@ namespace STGeneticsTest.Controllers
     [ApiController]
     public class UserController : Controller
     {
-        public static User user = new User();
         private readonly IConfiguration _configuration;
-        //private readonly IUserService _userService;
 
         public UserController(IConfiguration configuration)
         {
             _configuration = configuration;
-            //_userService = userService;
         }
 
-        //[HttpGet, Authorize(Roles = "Admi")]
-        //public ActionResult<string> GetMyName()
-        //{
-        //    return Ok(_userService.GetMyName());
-
-        //    var userName = User?.Identity?.Name;
-        //    var roleClaims = User?.FindAll(ClaimTypes.Role);
-        //    var roles = roleClaims?.Select(c => c.Value).ToList();
-        //    var roles2 = User?.Claims
-        //        .Where(c => c.Type == ClaimTypes.Role)
-        //        .Select(c => c.Value)
-        //        .ToList();
-        //    return Ok(new { userName, roles, roles2 });
-        //}
 
         [HttpPost("register")]
-        public ActionResult<User> Register(UserDto request)
+        public async Task<ActionResult<DefaultResponse<string>>> CreateAnimal(UserDto request)
         {
-            string passwordHash
-                = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            DefaultResponse<string> response = new DefaultResponse<string>();
+            try
+            {
+                DAL.UserTE userTE = new DAL.UserTE(_configuration);
+                string res = await userTE.CreateUser(request);
 
-            user.Username = request.Username;
-            user.PasswordHash = passwordHash;
-
-            return Ok(user);
+                if(res == string.Empty) {
+                    return BadRequest("Failed to create user");
+                }
+                else
+                {
+                    response.Data = "User successfully created.";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Error = true;
+                response.Msg = ex.Message;
+            }
+            return Ok(response);
         }
 
         [HttpPost("login")]
-        public ActionResult<User> Login(UserDto request)
+        public async Task<ActionResult<DefaultResponse<string>>> Login(UserDto request)
         {
-            if (user.Username != request.Username)
+            DefaultResponse<string> response = new DefaultResponse<string>();
+
+            try
             {
-                return BadRequest("User not found.");
-            }
+                DAL.UserTE userTE = new DAL.UserTE(_configuration);
+                string res = await userTE.Login(request);
 
-            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                response.Data = res;
+            }
+            catch (Exception ex)
             {
-                return BadRequest("Wrong password.");
+                response.Error = true;
+                response.Msg = ex.Message;
             }
-
-            string token = CreateToken(user);
-
-            return Ok(token);
-        }
-
-        private string CreateToken(User user)
-        {
-            List<Claim> claims = new List<Claim> {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, "Admin"),
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value!));
-
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-
-            var token = new JwtSecurityToken(
-                    claims: claims,
-                    expires: DateTime.Now.AddDays(1),
-                    signingCredentials: creds
-                );
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
+            return Ok(response);
         }
     }
 }

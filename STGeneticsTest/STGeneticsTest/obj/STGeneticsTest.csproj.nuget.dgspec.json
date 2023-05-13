@@ -22,7 +22,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "http://mazda-nuget.azurewebsites.net/api/v2": {},
           "https://api.nuget.optimizely.com/v3/index.json": {},
           "https://api.nuget.org/v3/index.json": {}
         },
@@ -46,6 +45,10 @@
               "target": "Package",
               "version": "[4.0.3, )"
             },
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.0.123, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[7.0.5, )"
@@ -65,6 +68,10 @@
             "Swashbuckle.AspNetCore.Filters": {
               "target": "Package",
               "version": "[7.0.6, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.5, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",

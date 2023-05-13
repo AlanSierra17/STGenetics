@@ -1,6 +1,6 @@
 --Insert
 
-INSERT INTO Animal ([Name], Breed, BirthDate, Sex, Price, Status)
+INSERT INTO Animal ([Name], Breed, BirthDate, Sex, Price, [Status])
 VALUES ('Bella', 1, '2020-03-02', '2', 1750.99, '1');
 
 --Read
@@ -19,4 +19,5 @@ WHERE AnimalId = 2;
 -- Delete
 
 DELETE FROM Animal
-WHERE AnimalId = 3;
+WHERE AnimalId = 6;
+
