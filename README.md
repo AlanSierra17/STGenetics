@@ -11,5 +11,5 @@ Note: to create an user use the registration endpoint.
 - Dapper is used as the Micro ORM.
 - All endpoints are built using async/await for improved performance and scalability.
 
-##Database construction
+## Database construction
 - To create the database, you need to execute the script named "01_Data_Base_Script.sql" located in the scripts folder. 
